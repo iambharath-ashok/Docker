@@ -1,0 +1,603 @@
+Docker for Java Developers
+
+Section 1: Introduction To Docker 
+
+	
+Lecture 1: What is Docker 
+
+	1.	Docker is a containerization technology
+	2.	A Container is an isolated environment that has their own
+		1.	Have their own disk space, network interfaces, process tree 
+	3. 	Docker containers share the same linux kernel	
+	4. 	Docker is not a VM and does not mean to run to virtualize the os
+	5. 	Docker is meant to build, ship and run the application and services in a isolated containers
+	
+	
+	Docker Terminology
+	
+		a.	Docker Image:
+			-	Docker Image is representation of Docker Container
+			-	Docker Image will have its own set of dependencies like jar or war in java
+			
+			
+		b.	Docker Container
+			- 	Runtime instance of Docker Image 
+			- 	It's a isolated environment
+			-	Like Spring Boot Executable jar
+	
+		c.	Docker Engine
+			- 	Docker Engine manages the Docker Objects
+			-	Creates and run the containers
+			
+	
+	Which Edition for Java Developers
+
+		a. 	Functionally two editions were same like RHEL and CentOS
+		b.	Community Edition is best suit for Java Developers
+		c.	Docker Community edition is not available on the Commercial OS like RHEL and SUSE
+		
+	
+Lecture 2 : KiteMatic GUI
+
+	1.	KiteMatic is a GUI tool for running Docker images from the Docker Hub
+	2.  We Create and Run the docker images from the GUI using KiteMatic
+	3.	We can see the logs of running containers
+	
+
+
+Lecture 3: Working with Containers and Images
+
+	1.	Running mongo containers
+		
+			docker run --name mongo-db -d mongo
+		
+	2.	If we run containers in a interactive mode and that session gets terminated then Docker Container will gets terminated
+	
+	3.	To run the containers in background mode we need to use the -d argument 
+	
+			docker run -d mongo
+		
+	4. Port Mapping b/w Docker Host and Docker Container
+
+			docker run -p 27017:27017 mongo
+	
+	5.	Docker Container logs from the command promt
+	
+			docker logs -f CONTAINR_NAME
+			
+	6.	Docker Images
+		
+		-	Docker Images are immutable 
+		-	Once built files making up an image doesn't change
+		-	Image defines the Docker Container
+		- 	Class vs Instance of class
+		
+	7.	Image Layers
+	
+		-	Images are built in layers
+		-	Each layers is an immutable file but is an collection of files
+		-	Layers receives an ID, calculated via SHA 256 hash of the layer contents
+		- 	If layer of the image changes then SHA 256 also changes
+		- 	Image ID listed by docker commands are first 12 characters of the hash
+		- 	Hash value of images are referred to as tag names
+		- 	Tag name Registry host and username and tagname
+		
+			REGISTRYHOST/[USERNAME/]NAME[:latest]
+			
+			registry.hub.docker.com/mongo:latest
+			
+			
+			docker images 
+			docker image inspect mongo
+			
+			
+	8.	Dockerfile
+
+		-	Using Dockerfile we can inherit from one Dockerfile to another
+		-	Ex: Mongo inherits from debian:wheeze and we can inherit from the mongo docker image
+	
+	9.	Non-persistent Storage
+	
+		-	When a container is created, a new top layer is created called container layer to write data to that layer
+		- 	Container Layer is Read and write
+		- 	Life of container layer is until container gets destroyed
+		-	EX: All the DB Data will be stored in the last layer
+			-	When container is destroyed then last layer container layer will also gets destroyed
+			-	So all the data stored in the container layer will gets lost
+		- 	When new Container is created then a new container layer is created and old will be gone away
+			-	So we will end up with blank DB
+		- 	Solution for this Non-persistent storage is we need to volume map b/w Docker Container and Docker Host
+		
+	
+	10.	Docker House Keeping
+	
+		-	Docker in development environment takes lot of disk space and leaves lot of files
+		- 	These files will grow and may result in more disk space consumption
+		-	This is less issue in Production environment where containers are not being built
+		- 	There are 3 key areas of house keeping
+		
+			a.	Containers
+			b.	Images
+			c.	Volumes
+			
+			
+			a. Cleaning Up Containers
+				
+				- 	Kill all Running Docker Containers 
+				
+						docker kill $(docker ps -q)
+
+
+				-	Delete All Stopped Containers
+						
+						docker rm $(docker ps -a -q)
+	
+		
+		
+
+		
+			b.	Cleaning Up Images
+			
+				-	Remove a Docker Image
+					
+						docker rmi IMAGE_NAME
+						
+				-	Delete Untagged(Dangling) Images
+				
+						docker rmi $(docker images -q -f dangling=true)
+	
+				- 	Delete All Images
+				
+						docker rmi $(docker images -q)
+						
+						
+			c.	Cleaning Up Volumes
+			
+				-	Once volume is not associated with Container its considered as Dangling Volumes
+				
+				- 	Removing all the Dangling Volumes
+						
+						docker volume rm $(docker volume ls -f dangling=true -q)
+						
+				- 	Does not remove files from host system in shared volumes
+				
+	
+						What command will show running containers?
+							Ans: docker ps
+
+						What command will show all containers? Running and stopped?
+							Ans:  docker ps -a
+
+						What is the default tag?
+							Ans:   ‘latest’ is selected if no other value is specfied
+
+						What command do you use to run a docker image?
+							Ans:  docker run <image name>
+
+						How do you see the console output of a docker container?
+							Ans:  docker logs <container name>
+
+						What command is used to build a docker image?
+							Ans:  
+								From the directory of the Dockerfile
+								run:
+								docker build -t <tag name> .
+
+						How do you stop a docker container?
+							Ans:  
+								docker kill <container name>
+								OR
+								docker stop <container name>
+
+						What parameter tells docker to run the container as a background process?
+							Ans:  
+								-d
+								Example:
+								docker run -d <image name>
+
+						How you you list all docker images on your system?
+								Ans:  
+									docker images
+
+						How do you map a host port to a container port?
+							Ans:  
+								-p <host port>:<container port>
+								Example:
+								docker run -p 8080:8080 <image name>
+
+						How do you tail the console output of a running docker container?
+							Ans:  	
+								docker logs -f <container name>
+
+						What is like a .java file to a docker image? ie, the source code?
+							Ans:  The Dockerfile
+
+						What command will remove a stopped docker container?
+							Ans:  docker rm <container name>
+
+						How do you specify a environment variable for a docker container?
+							Ans:   docker run -e MY_VAR=my_prop <image name>
+
+						How do you remove a docker image from your system?
+							Ans:  docker rmi <image name>
+
+						How do you shell into a running docker container?
+							Ans:  docker exec -it <container name> bash
+
+						How you you share storage on the host system with a docker container?
+							Ans:  
+								-v <host path>:<container path>
+								Example:
+								docker run -v <my host path>:<the container
+								path> <image name>
+									
+	
+			
+	
+
+
+
+
+
+
+Section 4: Running Spring Boot Application Inside Docker Container
+
+
+
+	1. Preparing CentOS for Java
+
+		- 	CentOS is similar to RHEL and contains all the features that RHEL supports
+		-	By default CentOS doesn't have Java Installed on it
+		- 	Installing Java on CentOS Container
+		
+			docker ps 
+			docker run -d centos
+			docker ps
+			docker logs CONTAINER_ID
+			docker run -d centos tail -f /dev/null
+			docker exec -it CONTAINER_NAME bash
+			
+			yum install java
+	
+	2. Running Spring Boot Application from the Docker Container
+
+		- 	Build the Maven Spring Boot Application
+		- 	Create the Spring Boot Executable jar
+		-	Create a Dockerfile
+			
+			Dockerfile Content
+			
+				FROM centos
+				
+				RUN yun install -y java
+				
+				VOLUME /tmp
+				
+				ADD /spring-boot-web-snapshot-1.0.0.jar myapp.jar
+				
+				RUN sh -c 'touch myapp.jar'
+				
+				ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/myapp.jar"]
+			
+			
+		docker build -t spring-boot-docker .
+
+		docker run -p 8080:8080 -d spring-boot-docker
+		
+		docker logs -f CONTAINER_ID
+			
+			
+
+
+Section 5: Automating Building Docker Images
+
+	1. 	Fabric 8 Maven Plugin 	
+		
+		- 	Fabric8 is a maven plugin used to build the Docker image during maven build process
+		-   maven clean package and docker build
+		-	Building Docker Image
+				mvn clean package docker:build
+		- 	Pushing Docker Image to Docker Hub
+				mvn clean package docker:build docker:push
+				
+	
+	
+	2. 	Dockerfile Template
+	
+		- 	We can write a groovy script to create a Dockerfile using a Dockerfile Template at maven build process
+		- 	In Dockerfile Template we need to specify the artifact name that is used to build the Docker Image
+		-	Every time we change the artifact version we need to manually update the Dockerfile to have the updated artifact name
+		-	We can write a groovy script that creates Dockerfile having the updated artifact name from the template
+		
+		
+			Dockefile Template
+				
+				FROM openjdk
+				
+				VOLUME /tmp
+				
+				ADD maven/${fileName}.jar  ${fileName}.jar
+				
+				RUN sh -c "touch /myapp.jar"
+				
+				ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/${fileName}.jar"]
+				
+				
+				
+		
+			Groovy script 
+			
+			
+			Dockerfile generated at runtime
+			
+				FROM openjdk
+				
+				VOLUME /tmp
+				
+				ADD maven/spring-boot-docker-0.0.1-snapshot.jar  spring-boot-docker-0.0.1-snapshot.jar
+				
+				RUN sh -c "touch /myapp.jar"
+				
+				ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/spring-boot-docker-0.0.1-snapshot.jar"]
+				
+				
+			
+			
+Section 6: Running Docker Images from Maven	
+
+			
+	1. 	Running Docker container from mvn on specific ports
+	
+		<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.20.0</version>
+				<configuration>
+                    <!--<dockerHost>http://127.0.0.1:2375</dockerHost>-->
+                    <dockerHost>unix:///var/run/docker.sock</dockerHost>
+
+                    <verbose>true</verbose>
+					<images>
+						<image>
+							<name>${docker.image.prefix}/${docker.image.name}</name>
+							<build>
+								<dockerFileDir>${project.basedir}/target/dockerfile/</dockerFileDir>
+
+                                <!--copies artficact to docker build dir in target-->
+								<assembly>
+									<descriptorRef>artifact</descriptorRef>
+								</assembly>
+								<tags>
+									<tag>latest</tag>
+									<tag>${project.version}</tag>
+								</tags>
+							</build>
+							<run>
+								<port>8080:8080</port>
+							</run>
+						</image>
+					</images>
+				</configuration>
+			</plugin>
+			
+			
+			
+		mvn docker:start
+		mvn docker:stop
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

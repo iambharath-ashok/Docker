@@ -1,0 +1,1478 @@
+Docker For Beginners
+Section 1
+
+1.	Problems without Docker or Problems with current Architecture
+		1.	Requirement to setup end to end stack including various technologies like 
+			a.	Web-services using Node js
+			b.	DB as mongo
+			c.	Messaging system like redis
+			d.	Orchestration tools like ansible
+		2.	We wil face lots of issues while developing this Application with all of this diff components
+			a.	Compatibility Issue with OS
+				i.	All the services need to be compatible with OS libraries and dependencies
+				ii.	We need to check the compatibility b/w services and the OS libraries and dependencies
+				iii. We will have issues where diff services require diff set of libraries and dependencies
+				iv. services are incomapatible with each other
+				v. Architecture of applications  changes over time and we needs to update the services version
+					- Upgrading to newer version will be difficult
+					- Evertime we go for upgradation we need to check for the compatibility b/w services and OS
+		3.	This problem of the compatibility is know as "Matrix of Hell".
+		4.	Takes Longer time to setup
+			a.	New developer needs to set up large set of s/w and appls and workspaces
+			b.	Needs to excute the hundred of instructions
+			c.	They have to make sure about the right versions of the services
+			d.	Set up by himself
+		5. Diff Dev/Prod  Test Env
+			a.	Developer 1 may building  App in one Platform (win)
+			b.	Developer 2 may building App in another Platform (mac)
+			c.	We cant gurantee that same behaviour in all the env.
+			
+			
+		All the above things made developing, testing, building really difficult
+
+		Docker solves all the above problem.
+
+2.	What is Docker
+	1.	Docker is containerization technology that runs each services and application in an isolated env called container
+		having its own set of dependencies and runtime env.
+	2.	Docker containerizes application and runs in its own set of dependencies.
+	3.	Docker runs each services or components in a separate container
+	4.	Docker runs services with its own set dependencies independently in a isolated container on same VMs or OS
+	5.	With Docker we need to build the docker configuration file only once.
+	6.	Developer can gets started with single docker run command 
+	
+	
+	Image 1_DockerRuntimeArchitecture1.jpeg
+	
+3.	Container
+	1.	Containers are isolated env which is having its own set of just like VMs expect they share same OS or kernel
+		a.	Network interfaces
+		b.	Mount points or volumes 
+		c.	Services and Process tree
+	2.	Container are not new technology
+	3.	Docker uses LXC container
+	4.	Setting up of container is very hard as they deal with low level
+	5.	Docker provides powerful functionalities and tool that helps end user to spin up the containers easily and faster manner.
+	
+	Image 2_DockerContainers.jpeg
+	
+	
+4. Understanding of how Docker works
+	1.	OS/Kernel Concept
+		a.	There are two parts in an OS
+			i.	Kernel ---> interacts with hardware
+			ii.	S/w(libraries and dependencies) ---> Provides user an interface to interact with kernel
+		b.	While kernel remains same which is Linux
+			i. S/W or libraries and dependencies makes the OS diff from each other
+			ii.	Example: ubuntu, debian, fedora, Red Hat, Centos
+		c.	All the Linux based OS share the same kernel and s/w make them diff from each other
+		
+			Image 3_OS_sharing_the_same_kernel.jpeg
+
+	2.	Sharing the Kernel
+		a.	Docker can run any os on top it as long as it shares the same kernel
+		b.	Each docker container will have additional s/w that makes them diff from each and shares the same kernel
+		c.	OS with different kernel cant run on the docker
+			Ex: Windows container cant be run on the docker installed on the ubuntu(ubuntu as docker host for the windows container)
+		d.	Docker is not meant for virtualize and run diff os on same hardware
+		e.	Docker is meant to containerize the App(build), ship and run them
+		
+		image 4_DockerRunningDiffOSOfSameKernel.png
+		
+	
+
+5. Diff b/w Containers and VMs
+
+	1.	Containers
+		-	Resource utilization is less
+		-	Consumes less disk space ---> MB
+		- 	Boot-up time is very less --> seconds
+		-	Containers are less isolated as they share same kernel
+		-	Containers can only run OS with same kernels
+		
+	2. VMs
+		-	Resource utilization is high
+		- 	Consumes more disk space ---> GB
+		- 	Boot-up time will be more ---> minutes
+		-	VMs are more isolated as they run on their own kernel
+		- 	VMs can run any OS
+		
+		image 5_Diff_bw_vms_containers.png
+		
+6.	How Dockerization is done
+	
+	1.	Lots of containerized version of s/w are already available in market (docker hub)
+	2.	Most organizations have containerized their products and made available in the docker registry called docker hub
+	3.	We just need to identify the image the run the docker run command
+	4.	Bringing up the whole application is easy as running the docker run command
+	
+	EX:
+		docker run ubuntu
+		docker run ansible
+		docker run nodejs
+			- when running the nodejs container, just point to the location of source code on the docker host
+		
+	5.	If we need to run multiple instances of web-server then 
+		-	Add or run as many as required
+				docker run nodejs
+				docker run nodejs
+		-	Configure load balancer in the front 
+		-	If one of the instances fail 
+			- 	simple destroy the container and launch the new container
+			
+=========================================================================================================================================
+
+How to install docker 
+
+1.	Versions of Docker 
+	a.	Docker CE (Community Edition)
+	b.	Docker EE (Enterprise Edition)
+
+	a. Docker CE
+		1.	Select appropriate Docker CE version based on the host
+		2.	verify the host details
+			cat /etc/*release*
+		3. docker run -it ubuntu bash
+		
+
+=========================================================================================================================================
+
+Section 2: Docker basic commands
+
+	
+	1.	Run  a container	
+		
+		docker run ubuntu
+	
+	2.	List all the running containers
+		
+		docker ps 
+	
+	3. List all the running and stopped containers
+		
+		docker ps -a
+		
+	4. Stop a container
+		
+		docker ps
+		docker stop container_name
+		docker ps -a
+	
+	5.	Remove the container
+	
+		docker rm container_name
+		docker ps 
+		docker rm container_name
+		
+	6.	List Images
+		
+		docker images
+		
+	7. Remove the image from local docker host
+		
+		docker rmi <Image_name>
+		docker rmi ubuntu
+		
+	8. PULL the docker image from docker hub to docker host
+
+		docker pull IMAGE_NAME
+		
+	9. Docker Append 
+		
+		- When there were no running services on the container docker will stop the docker container
+
+	10. Executing the commands in already running container
+		
+		docker ps
+		docker exec CONTAINER_NAME cat COMMAND_TO_EXECUTE
+		docker exec ubuntu_bash cat  /etc/hosts
+		
+	EX:
+		
+	docker run centos sleep 200
+	docker ps -a
+	docker run -d centos sleep 2000
+	docker stop da6b
+	docker ps -a
+	docker rm centos
+	docker images
+	docker rmi centos
+	docker pull cnentos
+	docker exec aaa bash
+	docker exec bbb cat /etc/hosts
+	docker rm da bf
+	
+=========================================================================================================================================
+
+Section 3: Docker Run command arguments
+
+	1.	Run container with tag
+		a.	Tag is image name with version
+			
+			docker run ubuntu:latest
+			docker run node:9.5.2
+		
+	2.	Run container in attach or detach mode
+	
+		a.	Detach Mode
+			
+			docker run -d ubuntu
+				
+			- 	This is container is background mode
+		
+		b.	Attach Mode	
+			
+			docker attach ubuntu
+			
+			-	This will bring the docker to foreground
+			
+	3.	Run container by listening to Standard Input
+
+		a.	Standard Input is Keyboard
+		
+		b.	Docker container by default will not listen to STD Input
+		
+			docker run -i ubuntu
+			
+	4.	Run container with port mapping
+
+		a.	Each Container will be assigned with an IP address and this IP address will be part of Internal Private N/w
+		
+		b.	Docker Container can be accessible with in the Internal Private N/w or from the Docker Host
+
+		c. Docker container can be accessible from the docker host using the container IP address
+		
+		d. In-order to access from the outside n/w, we need to do the port mapping b/w the docker host and docker container
+		
+		
+			SYNTAX : docker run -p DOCKER_HOST_PORT:DOCKER_CONTAINER_PORT IMAGE_NAME
+			
+				docker run -p 80:5000 ubuntu
+				docker run -p 8001:5000 ubuntu
+				docker run -p 8002:5000 ubuntu
+				docker run -p 3306:3306 mysql
+				
+		e.	An error will thrown out if we try to map the already used port on the docker hosts
+
+
+	5.	Run container with Volume mapping
+	
+		a. 	Data in the container are isolated and only available in the container
+		
+		b.	If container gets destroyed then all the data will gets destroyed
+		
+		c.	In order to avoid the data loss we need to map the volumes(File System) b/w docker container and docker host
+		 
+			
+			docker run -v DOCKER_HOST_FILE_SYSTEM_PATH:DOCKER_CONTAINER_FILE_SYSTEM_PATH IMAGE_NAME
+			docker run -v /opt/datadir/mysql:/var/lib/mysql mysql
+		
+		
+		d.	In this way, even if container gets destroyed, data will be available on the docker host and launch the new container and can map the
+				mount the volume present on the host
+				
+=========================================================================================================================================
+Section 4: Docker Images
+
+
+	1. Why we need to create our own image
+		
+		a.	Team has decided to dockerize the app for easy shipping and deployment
+		
+		b.	We cant find a service component that we can use for application on docker hub
+		
+		c. Docker image can be created with docker build command
+		
+			
+			docker build .	imbharath/my-app
+			
+		d. Dockerfile with commands 
+
+			FROM ubuntu
+			
+			RUN apt-get update
+			RUN apt-get install python
+	
+	
+			RUN pip install flask
+			RUN pip install flask-mysql
+			
+			COPY . /opt/source-code/
+			
+			ENTRYPOINT FLASK_APP=/opt/source-code/app.py flask run
+			
+			
+		e. building a docker image of the above Dockerfile
+		
+			
+			docker build . imbharath/my-app
+			docker build Dockerfile -t iambharath/my-app
+			
+			
+=========================================================================================================================================
+Section 5: Docker Compose
+
+	a.	Docker Compose will be used if we have a large set of services that interact with each other
+	
+	b. 	Docker compose will best suite for PROD env
+	
+	c. 	Docker compose is a yml file which defines set of services of the application
+	
+	d. 	We can bring the entire stack by just running the docker-compose up command
+	
+	
+			docker-compose up 
+			
+	e. 	Docker Compose example
+	
+			version: '3'
+			services:
+			  mysql:
+				  image: "mysql"
+				  environment:
+					- MYSQL_ROOT_PASSWORD=password
+				  volumes:
+					- "/data/mysql:/var/lib/mysql"
+			  web:
+				image: "wordpress"
+				ports:
+				  - "8080:80"
+				environment:
+						- WORDPRESS_DB_PASSWORD=password
+						
+	f.	docker 	compose file name 
+			
+				docker-compose.yml
+	
+=========================================================================================================================================
+Section 6: Docker Swarm
+
+
+	a.	Single Docker host with multiple containers are suitable for the test/dev environment
+	
+	b.	We cant use single docker host on the prod env if that host fails or went down then whole application will go down
+	
+	c. 	Docker Swarm is a multi-node cluster that runs multiple instances of services on one or more worker nodes
+	
+	d. 	Using Docker swarm we can manage multiple docker hosts as a single cluster
+	
+	e.	Docker swarm will takes care off placing the services on the docker hosts for high availability
+	
+	
+		Manager Node
+			
+			docker swarm init
+		
+		Worker Node
+			
+			docker swarm join --token TOKEN_ID
+			
+		Deploying the stack
+			
+			
+			docker stack deploy -c docker-compose.yml
+			
+=========================================================================================================================================	
+Section 7: Docker Networking
+
+
+	1.	When docker is installed on the docker host, docker automatically installs 3 kinds of n/w
+		
+		a. 	Bridge
+		b.	Host
+		c. 	None
+
+
+		a.	Bridge	
+			1. 	Bridge N/w is default
+
+			2. 	Bridge N/w is the Internal Private N/w created by docker on the docker host
+			
+			3. 	All the newly created containers gets an IP Address and attached to this Internal Private N/w
+			
+			4. 	Containers with in this n/w can communicate with each other using assigned IP address and Internal Private N/w
+			
+			5. With Bridge n/w, we need to do the port mapping b/w the docker host and container to access from the outside n/w
+	
+		b.	Host
+			1.	With Host N/w there will be no isolation b/w the docker container and docker host
+			
+			2.	Container services can be directly accessible from the outside n/w
+			
+			3.	We cant run multiple containers with same port with n/w=Host
+			
+					
+					docker run ubuntu --network=host
+					
+		c. 	None
+			1. Containers with none mode cant accessible from docker host and outsdie n/w and within the container
+			
+				docker run ubuntu --network=none
+				
+	2. User defined N/w
+
+		a. 	By default docker creates only one Internal private N/w on the docker host
+		
+		b. 	In-order to create and isolate two Internal private N/ws on the docker host, we need to create new internal private n/w
+		
+			
+			
+				docker network create \
+					--driver  bridge \
+					--subnet 182.18.0.16/16 \
+					custom-isolated-network
+					
+	3. How to create container on specific port
+
+		docker run -p HostPort:DockerPort IMAGE_NAME
+		
+=========================================================================================================================================				
+
+														Docker Advanced
+
+
+
+Section 8: Docker on Windows
+
+
+	1.	We can run docker on windows in two ways
+		
+		a.	Docker on Windows
+		b.	Docker for Windows
+		
+		a.	Docker on Windows
+			
+			-	Docker on windows uses Docker Toolbox
+			
+			i.	Docker Toolbox
+				
+				-	Docker toolbox comes with various tools
+					
+					-	Oracle Virtual Box
+					- 	Docker Engine
+					- 	Docker Machine
+					- 	Docker Compose
+					- 	Kitematic GUI
+			ii.	Requirement for running docker on windows or docker toolbox
+			
+				-	64 bit OS
+				-	Windows 7 or higher
+				-	Virtualization should be enabled
+		
+
+		b.	Docker for Windows(DFW)
+			
+			1. 	Docker for Windows is a exciting one
+			2.	Support
+				-	DFW will supported only on the 
+				
+					-	Windows 10 Pro
+					- 	Windows 10 EE
+					- 	Windows Server 2016
+				
+			3.	Docker for windows stack
+				
+					- 	Windows OS
+					-	Microsoft Hyper-V
+					-	Linux VM
+					- 	Docker 
+					
+				Image 8_Docker_for_Windows.png	
+				
+			4. 	Default Option on DFW
+			
+					-	To work with Linux container
+					-	we will run Linux containers on light weight Linux OS running the Docker engine behind the scenes
+					
+			5.	Additional Option for DFW
+					
+					- In 2016, Microsoft announced Windows Container
+			
+			6.	Windows Container
+				
+					- 	We can create windows based images
+					-	And run windows containers on windows server
+					-	Just like Linux Containers on Linux OS
+					
+					
+	
+
+
+	2.	Types of Containers in Windows
+		
+			a.	Windows Server Container
+				
+					-	Exactly like Linux containers
+					- 	Containers share underlying OS kernel
+					-	Windows container on native windows server core
+					
+					Image 6_Windows_Server_Container.jpeg
+			
+			b.	Hyper-V Isolation
+				
+				-	To provide better security boundary b/w containers
+				-	Each container will run in highly optimized VM with own kernel
+				-	Guarantees the complete isolation b/w containers and underlying host
+				-	Windows container on an isolated hyper-v kernel
+				
+				Image	7_Hyper-V_Isolation.jpeg
+				
+				
+	3.	Base Images
+			
+			a.	Linux World
+			
+				-	Fedora
+				-	Debian
+				-	Ubuntu
+				-	Alphine
+				
+			
+			b.	Windows World
+				
+				-	Windows Server Core
+				- 	Nano Server
+						
+					-	Like Alphine in Linux World
+					-	May be Lightweight
+
+				
+
+
+	4. Windows Container Support
+		
+		-	windows containers are supported in below Editions
+						
+			-	Windows Server 2016
+			-	Nano Server
+			- 	Windows 10 Pro/EE (Hyper-V Isolated Container) 
+			-	Windows 10 Pro and EE only supports Hyper-V Isolated Containers
+				- Every Containers run on the highly optimized VM
+				
+				
+=========================================================================================================================================		
+
+
+Section 8: Demo Docker on Windows
+
+	1.	Download Docker for Windows (DFW)
+		
+		-	Docker Store	
+			- 	http://www.docker.com/docker-windows 
+		-	Get Docker CE for Windows(Stable)
+			-	docker store
+		-	Install Executable
+			
+	2.	Server Manager Dashboard
+		
+		a.	Windows Server Manager
+			
+			-	Its a s/w used to manage the remote windows server from local windows 10 PC
+			
+	3. 	Installing the DFW
+		
+		-	Hyper-V must be enabled on the docker host to use the DFW
+		-	Otherwise DFW will be errored out
+		-	It will ask for auto enabling
+		-	And server will get restarted
+		
+	4.	Run docker version command
+	
+		-	Windows 10 System that runs a DFW is a docker client
+		-	Client will try to  connect to Docker server
+		-	Docker server can be in same host or remote host
+		- 	By default Docker server will also gets installed on the docker host
+		
+		Image 9_DFW_version_docker_client.png
+		Image 10_DFW_version_docker_client_server.png
+		
+		
+	5. 	Docker server on DFW
+
+		-	By default docker server will run on Linux VM
+		-	When we install DFW for first time
+			- 	Docker automatically installs a test Linux VM
+			- 	Docker will be installed on the Linux VM
+		- 	Docker client on windows will try to connect to Linux VMs
+		
+	6.	Run Docker Containers
+		
+			-	docker run hello-world
+			-	docker run -it ubuntu bash
+			
+		-	Once we run the docker containers on the docker server with Linux VM 
+		- 	It will download the Linux based images and run the container
+		- 	Linux based images are less in size compared to Windows Images
+		- 	With Linux as DFW server, we can run the Linux containers on the Windows OS
+		
+		
+		- 	When we run Linux containers it will not run directly on the windows os
+		- 	Instead it will run on the Linux VM deployed on the Hyper-V
+		
+		
+	7. Switching DFW to use the Windows OS or Windows Containers
+	
+		- 	With Windows Server 2016 and Windows 10 Pro/EE, we can run Windows based containers
+		- 	Rith click bottom right
+		-	Restart the server
+		-	Docker Version
+			-	Docker Server will run on  Windows OS using VM
+			- 	Both client and server will be running on the same OS
+			
+		-	Execute docker run commands
+			- 	docker run hello-world
+			-	docker ubuntu
+		
+		- 	This will run the windows based docker containers
+		-	This time it will take more time as windows based images are huge in size
+	
+
+=========================================================================================================================================
+
+Section 8: Docker Architecture
+
+
+	1.	Docker Engine
+		
+		-	Docker Engine refers to docker host
+		-	Docker host is host where docker is installed
+		
+	2.	When we install docker on the Linux, we are installing 3 diff things
+				
+		a.	Docker Daemon
+		b.	Rest API Server
+		c.	Docker Cli
+		
+		Image 11_Docker_Architecture.png
+
+
+			a. Docker Daemon
+				
+				-	Docker Daemon is a background process 
+				-	Docker Daemon manages the docker objects
+				- 	Docker objects 
+				
+						1.	Docker Images
+						2.	Networking
+						3.	Volumes
+						4.	Containers
+						
+			
+			b.	Rest API Server
+			
+				-	REST API is a interface
+				-	Programs can make use of REST API to communicate to docker daemon 
+				-	And provide instructions to the daemon
+				
+			
+			c.	Docker CLI
+				
+				-	Docker CLI is command line interface
+				-	Used to execute the Docker commands
+						
+						docker run
+						docker stop
+						docker pull 
+						docker build
+				
+				-	Docker CLI and DD can be run on the same host or the two diff host
+
+				
+					Image 12_DockerCLI_DockerDaemon.png
+		
+		
+
+	3. How exactly application is containerized(Isolated) in docker
+	
+		a.	Docker uses namespaces to isolate the workspaces 
+			
+			1.	Process Id
+			2.	InterProcess communication
+			3.	Mount
+			4.	N/W
+			5.	Unix Timesharing
+			
+		b.	Docker creates own processID, Inter Communication Process, Mount, N/w, Unix timesharing in their own namespaces to provide isolation b/w containers
+		
+		
+	4. Namespaces (PID)
+		
+		a.	PID is one of the isolation technique
+		b.	At Linux Bootup time
+			- 	Start with 1 process
+			-	First Process will start all child process
+		c.	Container is like a child system with in the current system
+			-	Container has its own set of processes and PIDs
+		d.	Since there is no hard isolation b/w host and container 
+			-	Processes inside the container are also processes in host 
+		e.	Whenever a new process is created inside a container
+			-	Then a new process is also created inside host with next available PID 
+		f.	Container will also gets its own set of PIDS and process tree
+		g.	EX: Running nginx as a container
+			
+			-	when we run nginx as a container
+			-	It creates a new nginx server with PID 1 inside a container
+			-	Similarly nginx service will also gets an PID in the docker host with diff pid
+				-	which makes them diff from the DH
+				
+		h.	In this way processes with in the docker host are separated by own containers using the namespace
+		
+		Image 13_DockerNamespaces.png
+		
+		
+	5.	CGGroups
+		
+		a.	Docker host and containers share the same underlying resources like memory and CPU
+		b.	By default there is no restriction on how much a container can use  the resources
+		c.	There is a way to restrict the amount of CPU and memory
+		
+				docker run --cpu=.5 ubuntu
+				docker run --memory=100m ubuntu
+	
+=========================================================================================================================================
+
+
+Section 9: Demo PID namespaces
+
+	a.	Running a tomcat container
+		- 	Go to docker hub
+		-	Copy the docker command and run
+		-	Example	
+			docker run -it --rm p 8888:8080 tocmcat:8.0
+			
+		- 	Executing the command inside a container
+			
+			docker exec 5arf... ps -eaf
+		
+=========================================================================================================================================
+
+
+Section 10: Docker Storage
+
+	1.	Docker Filesystem
+	
+		- 	When docker is installed on the host it will create a file system called
+			
+			-	/var/lib/docker
+			
+		-	All the data are stored in this file system
+			
+			- 	Files related to images
+			- 	containers
+			- 	volumes
+		
+		
+			Image 14_docker_filesytem.png
+
+
+	2.	Docker Layered Architecture
+		
+		a.	 How exactly docker stores the containers and image details in DH
+		
+			- 	When docker build images it builds in layered architecture
+			-	Each line in the Dockerfile is a new layer in a docker image
+			-	Next line in Dockerfile file will receive the results from the previous line
+			- 	Docker reuses previous layers from the cache and builds the subsequent layers that have changes
+			-	whenever code changes is made then docker simply uses previously available layer from cache
+				-	And rebuild the image with latest code
+				- 	In this way docker builds the images in faster manner
+			
+			
+			Image 15_Docker_LayerdArchitecture.png
+
+			
+	3.	Types of Layers
+		
+			1.	Image Layers
+			2.	Container Layers
+			
+
+			1.	Image Layers
+			
+					-	Image Layer instructions are docker build command
+					
+							docker build Dockerfile -t imabharath/my-simple-app
+					
+					- 	All the instructions in Dockerfile is a Image layer
+					-	Image layer instructions are Ready only and cant be change at runtime
+					- 	If we need to update any instructions of Image Layer then we need to rebuild the image
+					
+		
+			2.	Container Layers
+			
+					-	When we run the docker run command
+						
+						-	docker will create a new writable layer on top of image layers using the image
+					
+					-	Container Layer is Read-write 
+					- 	Life of Container layer is as long as Container itself
+					-	
+						
+		
+		
+	4. Volumes
+		
+		Types of mounting
+			
+			1.	Volume Mounting
+			2.	Bind Mounting
+					
+		
+		a.	Volume mounting is used to bind volume from container to docker host
+		
+		b.	Creating a Volume
+			
+			/var/lib/docker
+				|
+				|_volumes
+					|__data_volume
+			
+				docker volume create data_volume
+	
+		c.	once volume has been created we can use this at container layer at runtime
+				
+			-	We mount this location with docker host using docker run command
+			
+				docker run -v data_volume:/var/lib/mysql/ mysql
+				
+			- 	This kind of mounting is called volume mounting	
+
+			
+		d.	Even if volume is not created with volume create command then docker will automatically create volume and bind mount that to container 
+
+				docker run -v data_volume2:/var/lib/mysql mysql
+				
+		e.	mounting external volume path
+					
+				docker run -v /data/mysql:/var/lib/mysql mysql
+					
+				-	this will create the container and mount the /data/mysql path to container
+				- 	this is mounting is called bind mounting
+				
+				
+		f. New way of creating the mounting
+
+			docker run \
+				--mount type=bind,source=/data/mysql,target=/var/lib/mysql mysql
+			
+			
+		
+		
+	5. Storage Drivers
+
+		a. Storage Drivers are responsible for all the operations like
+			
+			- 	Maintaining Layered Architecture
+			-	Creating writable layers
+			-	Moving the files across layers
+			-	Copying writing files
+		
+		b.	Some of available storage drivers are
+		
+			- 	AUFS
+			- 	ZFS
+			- 	Overlay 2
+			- 	Overlay
+			-	Device Mapper
+			
+		c.	Selection of storage drivers depends on underlying OS
+
+		d. Docker chooses the storage drivers depending upon the OS
+		
+
+=========================================================================================================================================
+
+
+Section 11: Demo - Storage and Filesystem
+		
+		
+	a.	Docker will be installed on /var/lib/docker directory
+	
+			
+			docker info | more
+			docker images
+			docker history 05
+			
+	b.	Building Docker Image
+		
+			docker build  . Dockerfile -t iambharath/my-simple-app
+			
+		- 	When we build the image, first it will create the image and stores it in the local image section or image
+		
+			docker images
+			
+		- 	displays all the running containers
+
+	c.	How to verify that docker image is built
+		
+			docker history my-simple-app
+		
+	d.	Building docker image with custom Dockerfile
+	
+			docker build . -f Dockerfile2 -t iambharath/my-simple-app
+			
+			
+			
+=========================================================================================================================================
+
+Section 13: Docker Compose
+
+
+	1.	Docker Compose
+		
+		a.	Docker Compose will be used  for the complex application stack
+		
+		b.	Docker Compose will be used when appln is having multiple services
+		
+		c. 	Docker compose file will be in yml file
+		
+		d.	docker-compose up 
+			
+				- docker-compose up can be used to bring the entire stack up
+				
+				
+		e.	Application Stack
+		
+				
+				Voting APP					Result App
+				Python							Node js	
+					|							|
+				InMemory DB						DB 
+					Redis						mysql
+					
+							Worker App
+								.Net
+							
+							
+		f.	docker run commands
+			
+				docker run -d --name=redis redis
+				docker run -d --name=db postgress:9.4
+				docker run -d --name=vote -p 5000:80 --link redis:redis voting-app
+				docker run -d --name=result -p 5001:80 --link db:db result-app
+				docker run -d --name=worker --link redis:redis --link db:db worker
+
+		g. 	docker compose file with above services
+		
+				services:
+					
+					redis:
+						image:"redis"
+					db:
+						image:"postgress:9.4"
+					vote:
+						image:"voting-app"
+						ports:
+							- 5000:80
+						links:
+							- redis
+					result:
+						image:"result-app"
+						ports:
+							- 5001:80
+						links
+							- db
+						
+					worker:
+						image:"worker"
+						links:
+							- redis
+							- db
+		
+		
+		h.	Adding Link to services
+			
+			-	It will add the hostname and internal IP address of container in the host file
+						
+			- 	cat /etc/hosts 
+
+			-	172.0.1.3 redis
+			
+	2.	Building the Image and use them in compose.yml file
+		
+		
+		a.	If we have an custom code and
+		b.	That needs to build and needs to use the image 
+		c.	Then we use build property installed of image property
+		d.	Build property use cases
+			
+			- 	When ready made images are not available
+			- 	When we need to use our own images
+
+		e.	EX:
+				
+				build: ./vote
+				
+				./vote is a location of source code
+				
+					-	This will have Dockerfile at root directory
+					
+			- Dockercompose.yml
+				
+				services:
+					
+					redis:
+						image:"redis"
+						
+					db:
+						image:"postgres:9.4"
+					vote:
+						build: ./vote
+						ports:
+							- 5000:80
+						links:
+							- redis
+					result:
+						build:./result
+						ports:
+							- 5001:80
+						links:
+							-db
+					worker:
+						build: ./worker
+						links:
+							- db
+							- redis
+		
+
+			-	when we run the docker-compose up command, Docker will first build the images and use the built image to create the application stack
+			
+		
+	3. Docker Compose Versions
+	
+		-	 Docker compose have evolved into multiple versions
+		
+		
+		a. Version 1
+			
+				redis:
+						image:"redis"
+					db:
+						image:"postgress:9.4"
+					vote:
+						image:"voting-app"
+						ports:
+							- 5000:80
+						links:
+							- redis
+					result:
+						image:"result-app"
+						ports:
+							- 5001:80
+						links
+							- db
+						
+					worker:
+						image:"worker"
+						links:
+							- redis
+							- db
+		
+		
+			-	version 1 is having few drabacks
+			
+				a.	We cant specify the start sequence for the services(Service start up order) 
+				b.	We cant use other N/Ws, other than Bridge N/w
+				c.	We needs to use the links property to provide the links b/w the services
+				
+		b.	Version	2
+		
+			version: '2'
+			
+			Services:
+			
+				redis:
+						image:"redis"
+					db:
+						image:"postgress:9.4"
+					vote:
+						image:"voting-app"
+						ports:
+							- 5000:80
+						depends_on:
+							- redis
+					result:
+						image:"result-app"
+						ports:
+							- 5001:80
+						depends_on
+							- db
+						
+					worker:
+						image:"worker"
+						depends_on:
+							- redis
+							- db
+				
+			- 	With Version 1 docker compose will use the default bridge n/w to attach all the containers to it
+			-	Then uses the links property to provide link b/w containers
+			
+			- 	With version 2 docker compose will create new dedicated bridge n/w for the application and attaches all the containers to that n/w
+			-	Contianers with in that n/w will communicate with each other using the service name
+			-	Links property is not required in the Version 2 of Docker Compose
+					-	We can get rid of the links property
+			-	Version 2 also provides "depends_on" property to start the services in particular order
+			
+		
+				
+		
+	
+	4.	Docker Compose N/W
+		
+			a.	Adding frontend and backend n/w
+				-	Front End N/w 	- 	user/outside container
+				- 	Back End N/w	-	Apps/Within Container
+				
+			
+			b. docker-compose.yml
+				
+					version: '2'
+			
+					Services:
+					
+						redis:
+								image:"redis"
+								networks:
+									- back-end
+							db:
+								image:"postgress:9.4"
+								networks:
+									- back-end
+							vote:
+								image:"voting-app"
+								ports:
+									- 5000:80
+								depends_on:
+									- redis
+								networks:
+									-	front-end
+							result:
+								image:"result-app"
+								ports:
+									- 5001:80
+								depends_on
+									- db
+								networks:
+									-	front-end
+									-	back-end
+								
+							worker:
+								image:"worker"
+								depends_on:
+									- redis
+									- db
+								networks:
+									-	back-end
+
+					networks:
+						front-end:
+						back-end:
+
+
+=========================================================================================================================================
+
+Section 14: Docker swarm
+
+	1.	Running docker multiple containers on the single docker host will best suite for Test and Dev env
+	
+		- 	Its a single point of failure
+		-	If a underlying host fails, whole app stack will fail
+		-	Will lose all the containers
+	
+	2.	With Docker Swarm we can or combine bring multiple docker hosts into a single cluster
+	3.	Docker swarm will take care of distributing services into separate hosts for high availability
+	4.	Docker Swarm also helps in distributing the load across docker hosts
+	
+	5.	Setting Docker Swarm	
+		- 	Install docker on the docker host
+		- 	Designate one of the host as the manager node
+		-	And remaining nodes as slave nodes
+		- 	run docker swarm init on the manager node
+			
+			docker swarm init
+		
+		- run docker swarm join --token TOKEN_ID on the slave nodes
+
+			docker swarm join --token TOKEN_ID
+			
+	6.	Multi-manager cluster
+		-	When a manager node fails 
+		- 	Whole cluster will go down
+		- 	Its always better to use multiple manager nodes in a cluster
+	
+	7.	Leader Node
+		-	When we have multiple managers in a cluster then we will have a leader node that makes decision
+		
+		-	Leader Node alone makes the decision
+
+		-	Decision needs to be mutually agreed upon by all the managers
+		
+		-	If Leader fails to inform the one of the manager then cluster will be in a inconsistent status
+			-	EX:
+					If leader wants to add a new worker to the cluster and fails to update to any managers about changes
+						-	Then cluster operations will become inconsistent
+						- 	The other managers would not be aware of new workers
+						-	And Services running on that worker node will result in inconsistent application status
+		
+		-	This problem is known as problem of Distributed Consensus
+
+		-	Docker solve this problem by RAFT Consensus Algorithm
+		
+	8.	Docker RAFT Algorithm
+		-	Every manager node in cluster as it's own  RAFT DB
+		-	RAFT DB is a data or cluster status data
+		-	When leader wants to add a new worker then leader sends a update request to other managers in the cluster
+		-	In return it should get response from majority of managers
+		
+	9.	Quorum
+		
+		-  Quorum defines minimum # of members that should be present in the assembly at any of its meeting to make the proceeding of that meeting valid
+		
+		-  If cluster is with 5 managers then Quorum would be 3
+		
+		- 	Quorum of N = N + 1/2
+		
+		-	Quorum of 5 = 5 + 1/2	= 3
+		
+		- 	Docker recommends 7 managers
+		
+		- 	But no limit on the # of managers
+		
+		-	Always select odd # of master nodes when w designing the environment
+		
+		- Fault Tolerance N-1/2
+		
+				
+	10. Cluster Failure
+		
+		-	When majority of managers in cluster went down 
+		
+		- 	create a new cluster with  force new command
+		
+				docker swarm init --force-new-cluster
+		
+		- 	To add existing worker as a manager to cluster
+				
+				docker node promote
+				
+	11.	Can Manager work
+			
+		- 	Yes, by default managers can also work and has services running on it
+		
+		-	We can make manager node only to manage the nodes by
+		
+				docker node update --availability drain NODE
+				
+			
+=========================================================================================================================================
+
+
+Section 15: Docker Services
+			
+	1. 	Docker Orchestration
+		
+		-  	Docker Orchestration helps to run multiple instances of services on swarm cluster
+		
+	2.	Docker Service
+		
+		-	Docker service is one or more instances of single application or services or components that run across the swarm cluster
+		
+			-	EX: Multiple Instances of web application running across the cluster
+			
+			-	Command to create docker services
+				
+					docker service create --replicas=3 my-web-server
+				
+			- 	docker service command will be run on the manager node
+			
+			- 	docker service command is similar to docker run command
+			
+	3.	Docker Service Create command works
+
+		-	Docker Orchestration creates the scheduler
+		
+		-	Scheduler creates the tasks and assigns each of the tasks to single containers
+		
+		
+		Image *********************
+		
+	4.	Replicas
+	
+		- 	Replica services are created with --replica argument
+		
+		-	It will create requested # of instances of application on the available worker nodes
+		
+	5.	Replicas Vs Global
+	
+		a.	There are two types of services
+			
+			1. 	Replicas Services
+			2. 	Global Services
+				
+				2. 	Global Services
+					-	Services that needs to be run on each of the worker node in a swarm cluster
+					
+					- 	Monitoring S/W, Log Collector, Anti Virus
+					
+	6. Service Names
+		
+		- 	Docker automatically assigns the number to container name
+		
+		-	Command
+		
+				docker service create --replicas=3 --name web-service my-web-service
+				
+	7.	Service Update
+
+		-	Used to update the # of replicas in the cluster
+		
+		- Command
+			
+			docker service update -replicas=4 --name web-service
+
+
+			
+=========================================================================================================================================
+
+Section 16:	Docker N/w
+
+	1.	Three types of N/w
+		
+		
+		a.	Bridge
+		b.	Host
+		c.	None
+		
+		a. 	Bridge
+			-	Bridge N/w is  internal private n/w
+			-	Default
+			-	All containers attached to this n/w gets an internal private address
+				
+				docker run ubuntu
+				
+		b.	Host
+			-	No isolation b/w host and containers
+			
+				docker run ubuntu --network=none	
+		
+		c.	None
+			-	Container are not attached to any n/w
+			
+				docker run ubuntu --network=host
+			
+		
+	2. 	Overlay N/w
+	
+			- 	Overlay n/w is a Internal private n/w that spread across the docker swarm cluster(All the worker nodes)
+			-	Allows containers across the hosts to communicate with each other
+			-	With Docker swarm we can create new N/w that allows containers to communicate with containers that running on the different host
+			-	We can create a new overlay N/w and later we need to attach containers to that n/w while creating the service
+			
+			
+					docker network create --driver overlay --subnet 10.0.9.0/24 my-overlay-n/w
+					
+					docker service create --replicas=2 --network my-overlay-n/w nginx
+					
+					Image 17_Overlay_network.png
+					
+	3. 	Ingress N/w
+			
+			-	When we create	a docker swarm then it will automatically creates Ingress n/w
+			-	Ingress n/w has built in load balancer that redirects the traffic to container
+			-	No need to configure Ingress n/w 
+			-	Ingress is an overlay n/w that spans across the cluster
+			-	Ingress N/w automatically redirects incoming requests to container
+			
+				
+				Image 18_Ingress_network.png
+			
+			
+			
+	4.	Embeded DNS
+		
+			-	Containers with in the docker host communicate with each other using container name	
+			-	All containers in docker host resolves each other with name of the container
+			-	Docker has built-in DNS server that resolves the containers with each other
+			-	Built in DNS server always runs at 127.0.0.11
+			
+				Image 19_Embeded_DNS.png
+			
+=========================================================================================================================================
+
+Section 17:	Docker Stack
+
+		-	Instead of running the multiple docker run commands we can put it in a single docker-compose.yml file
+		- 	Use docker-compose up command to bring the whole application stack up in a single shot
+		-	Similarly if we want to run multiple instances of service or application in swarm cluster we will use 
+		
+					docker service command
+					
+		-	Instead of using multiple docker service commands we put all the service commands in docker-compose file and run docker stack deploy command
+		-	Docker compose with instances	
+			
+				a. 	Single Instances
+					
+						docker-compose up
+				
+				b.	Multiple Instances
+						
+						docker stack deploy
+	
+	
+					Image 20_Docker_stack.png
+	
+				
+	1. Stack	
+
+		a.	Container
+				
+				- 	A package form of an application that has its own dependencies and run on its own environment
+					
+					-	Node.js
+					- 	Mongo
+					-	Mysql
+					
+		b.	Service
+		
+				- 	A service is one or more instances of same services thats run on single host or diff nodes of cluster
+				-	EX:	Three instances of webservice running on same node or diff node
+			
+		c.	Stack
+			
+				-	A Stack is a group of interrelated services that forms a application
+			
+
+
+
+		
+				
+		
+		
+			
+				
+				
+			
+			
+			
+
+	
+	
+		
+		
+		
+
+		
+			
+			
+	
+	
+		
+		
+		
+		
+		
+			
+	
+	
+
+
